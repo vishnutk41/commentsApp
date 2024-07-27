@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "106532515641",
+    "project_id": "commentapp-25e13",
+    "storage_bucket": "commentapp-25e13.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:106532515641:android:4d5199a160de7b5ee982e8",
+        "android_client_info": {
+          "package_name": "com.example.commentsapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvPYXI8OC1L2JpvbL8kx2t8BgVig5_Irw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
