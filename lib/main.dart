@@ -1,11 +1,14 @@
+import 'package:commentsapp/controller/providers/firebase_auth_provider.dart';
+import 'package:commentsapp/controller/providers/useremailProvider.dart';
 import 'package:commentsapp/firebase_options.dart';
-import 'package:commentsapp/inside/comments_screen.dart';
-import 'package:commentsapp/login/login.dart';
-import 'package:commentsapp/signup/sign_up.dart';
+import 'package:commentsapp/view/comments_screen.dart';
+import 'package:commentsapp/view/login/login.dart';
+import 'package:commentsapp/view/signup/sign_up.dart';
+import 'package:commentsapp/view/widgets/splashScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'inside/comments_provider.dart';
+import 'controller/providers/comments_provider.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,8 +16,12 @@ void main() async{
    options: DefaultFirebaseOptions.currentPlatform,
  );
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => CommentsProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CommentsProvider()),
+        ChangeNotifierProvider(create: (context) => UserEmailProvider()),
+        Provider(create: (context) => FirebaseAuthProvider()), 
+      ],
       child: MyApp(),
     ),
   );
@@ -26,8 +33,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home:
-       CommentsScreen(),
+      //  CommentsScreen(),
       // LoginScreen(),
+      SplashScreen(),
       // SignUpScreen()
     );
   }

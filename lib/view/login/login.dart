@@ -1,43 +1,56 @@
-import 'package:commentsapp/login/login.dart';
-import 'package:commentsapp/route_manager.dart';
-import 'package:flutter/material.dart';
+import 'package:commentsapp/controller/providers/firebase_auth_provider.dart';
+import 'package:commentsapp/controller/utilities/constants.dart';
+import 'package:commentsapp/view/comments_screen.dart';
+import 'package:commentsapp/controller/route_manager.dart';
+import 'package:commentsapp/view/signup/sign_up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
-class SignUpScreen extends StatefulWidget {
+class LoginScreen extends StatefulWidget {
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
-  final TextEditingController _nameController = TextEditingController();
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   RouteManager routeManager = RouteManager();
+  final FirebaseAuthProvider _authProvider = FirebaseAuthProvider();
 
-  Future<void> _signUp() async {
+  Future<void> _login() async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+      User? user = await _authProvider.signIn(
+        _emailController.text,
+        _passwordController.text,
       );
-      // Successfully signed up
-      print('User signed up: ${userCredential.user}');
-
-      // Store user details in Firestore
-      await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).set({
-        'name': _nameController.text,
-        'email': _emailController.text,
-      });
-
-      // Navigate to the LoginScreen upon successful sign up
-      Navigator.of(context).push(routeManager.createRoute(LoginScreen()));
-    } on FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
+      if (user != null) {
+Navigator.of(context).pushAndRemoveUntil(
+  routeManager.createRoute(CommentsScreen()),
+  (Route<dynamic> route) => false,
+);      } else {
+        _showErrorDialog("Wrong credentials");
+      }
     } catch (e) {
-      print(e.toString());
+      _showErrorDialog("An error occurred: ${e.toString()}");
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -45,49 +58,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       backgroundColor: const Color(0xffCED3DC),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.only(left: 20, right: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            const Text(
+             Text(
               'Comments',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xff0C54BE),
-              ),
+style: commentsTextStyle,
             ),
             const SizedBox(height: 40),
             Column(
               children: [
-                _buildTextField('Name', _nameController),
+                _buildTextField('Email', _emailController, false),
                 const SizedBox(height: 20),
-                _buildTextField('Email', _emailController),
-                const SizedBox(height: 20),
-                _buildTextField('Password', _passwordController),
+                _buildTextField('Password', _passwordController, true),
               ],
             ),
             const SizedBox(height: 40),
             Column(
               children: [
                 GestureDetector(
-                  onTap: _signUp,
+                  onTap: _login,
                   child: Container(
                     height: 50,
                     width: 230,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: const Color(0xff0C54BE),
-                    ),
-                    child: const Center(
+                    decoration: buttonDecorationStyle,
+                    child:  Center(
                       child: Text(
-                        'Signup',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
+                        'Login',
+                        style: buttonTextStyle,
                       ),
                     ),
                   ),
@@ -95,21 +95,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
-                    Navigator.of(context).push(routeManager.createRoute(LoginScreen()));
+                    Navigator.of(context).push(routeManager.createRoute(SignUpScreen()));
                   },
                   child: Center(
                     child: RichText(
                       text: const TextSpan(
-                        text: 'Already have an account? ',
+                        text: 'New here? ',
                         style: TextStyle(
+                          fontFamily: "Poppins",
                           color: Colors.black,
                           fontWeight: FontWeight.w400,
                           fontSize: 16,
                         ),
                         children: [
                           TextSpan(
-                            text: 'Login',
+                            text: 'Signup',
                             style: TextStyle(
+                              fontFamily: "Poppins",
                               color: Color(0xff2652b8),
                               fontWeight: FontWeight.w700,
                               fontSize: 16,
@@ -128,15 +130,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
+  Widget _buildTextField(String label, TextEditingController controller, bool obscureText) {
     return SizedBox(
       width: 356,
       height: 35,
       child: TextField(
         controller: controller,
+        obscureText: obscureText,
         decoration: InputDecoration(
           hintText: label,
           hintStyle: const TextStyle(
+            fontFamily: "Poppins",
             color: Colors.black,
             fontSize: 14,
             fontWeight: FontWeight.w400,
