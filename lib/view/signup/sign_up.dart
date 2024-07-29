@@ -2,6 +2,7 @@ import 'package:commentsapp/controller/providers/firebase_auth_provider.dart';
 import 'package:commentsapp/controller/utilities/constants.dart';
 import 'package:commentsapp/view/login/login.dart';
 import 'package:commentsapp/controller/route_manager.dart';
+import 'package:commentsapp/view/widgets/popup_dialogues.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +16,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   RouteManager routeManager = RouteManager();
+  PopUpDialogues popUpDialogues = PopUpDialogues();
+
   final FirebaseAuthProvider _authProvider = FirebaseAuthProvider();
 
   Future<void> _signUp() async {
@@ -38,17 +41,17 @@ Navigator.of(context).pushAndRemoveUntil(
     String name = _nameController.text;
 
     if (name.isEmpty) {
-      _showErrorDialog('Name cannot be empty');
+      popUpDialogues.showErrorDialog('Name cannot be empty',context);
       return false;
     }
 
     if (!_isValidEmail(email)) {
-      _showErrorDialog('Invalid email address');
+     popUpDialogues.showErrorDialog('Invalid email address',context);
       return false;
     }
 
     if (password.length < 6) {
-      _showErrorDialog('Password must be at least 6 characters');
+    popUpDialogues.showErrorDialog('Password must be at least 6 characters',context);
       return false;
     }
 
@@ -62,23 +65,7 @@ Navigator.of(context).pushAndRemoveUntil(
     return emailRegExp.hasMatch(email);
   }
 
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Error'),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {

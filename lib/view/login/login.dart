@@ -3,6 +3,7 @@ import 'package:commentsapp/controller/utilities/constants.dart';
 import 'package:commentsapp/view/comments_screen.dart';
 import 'package:commentsapp/controller/route_manager.dart';
 import 'package:commentsapp/view/signup/sign_up.dart';
+import 'package:commentsapp/view/widgets/popup_dialogues.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -15,9 +16,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   RouteManager routeManager = RouteManager();
+  PopUpDialogues popUpDialogues = PopUpDialogues();
   final FirebaseAuthProvider _authProvider = FirebaseAuthProvider();
-
-  Future<void> _login() async {
+    Future<void> _login() async {
     try {
       User? user = await _authProvider.signIn(
         _emailController.text,
@@ -28,30 +29,14 @@ Navigator.of(context).pushAndRemoveUntil(
   routeManager.createRoute(CommentsScreen()),
   (Route<dynamic> route) => false,
 );      } else {
-        _showErrorDialog("Wrong credentials");
+        popUpDialogues.showErrorDialog("Wrong credentials",context);
       }
     } catch (e) {
-      _showErrorDialog("An error occurred: ${e.toString()}");
+      popUpDialogues.showErrorDialog("An error occurred: ${e.toString()}",context);
     }
   }
 
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Error'),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {

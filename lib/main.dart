@@ -1,4 +1,5 @@
 import 'package:commentsapp/controller/providers/firebase_auth_provider.dart';
+import 'package:commentsapp/controller/providers/user_provider.dart';
 import 'package:commentsapp/controller/providers/useremailProvider.dart';
 import 'package:commentsapp/firebase_options.dart';
 import 'package:commentsapp/view/comments_screen.dart';
@@ -20,6 +21,7 @@ void main() async{
       providers: [
         ChangeNotifierProvider(create: (context) => CommentsProvider()),
         ChangeNotifierProvider(create: (context) => UserEmailProvider()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
         Provider(create: (context) => FirebaseAuthProvider()), 
       ],
       child: MyApp(),
